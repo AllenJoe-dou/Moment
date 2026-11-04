@@ -17,6 +17,8 @@ test('participant page includes upload, presets, fields, background picker, and 
   assert.match(html, /id="submit-button"/);
   assert.match(html, /id="background-picker"/);
   assert.match(html, /一闪 Moment/);
+  assert.match(html, /favicon/);
+  assert.ok(fs.existsSync(path.join(root, 'public', 'favicon.svg')));
 });
 
 test('participant styles include liquid glass presentation and responsive rules', () => {
@@ -44,3 +46,4 @@ test('participant app wires API calls and accessible form labels', () => {
   assert.match(js, /aria-label/);
   assert.match(js, /FormData/);
 });
+
