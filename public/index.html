@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ff7aa7">
+  <title>一闪 Moment</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="participant-page">
+  <canvas id="liquid-background" aria-hidden="true"></canvas>
+
+  <header class="topbar glass-card">
+    <a class="brand" href="/" aria-label="返回一闪 Moment 首页">
+      <span class="brand-mark">✦</span>
+      <span>
+        <strong>一闪 Moment</strong>
+        <small>让此刻，被好好收藏</small>
+      </span>
+    </a>
+    <a class="admin-link" href="/admin">操作台</a>
+  </header>
+
+  <main class="page-shell">
+    <section class="intro">
+      <p class="eyebrow">A little moment, a lasting memory</p>
+      <h1>一闪 Moment</h1>
+      <p id="page-description" class="description">把这一瞬间，留给值得的人。</p>
+    </section>
+
+    <section class="image-section glass-card">
+      <div class="section-heading">
+        <div>
+          <span class="section-index">01</span>
+          <h2>选择一张照片</h2>
+          <p>上传自己的照片，或从预设中选一张。</p>
+        </div>
+        <span id="image-status" class="status-chip">尚未选择</span>
+      </div>
+
+      <div class="image-stage">
+        <img id="image-preview" alt="当前选择的图片预览">
+        <div id="image-empty" class="image-empty">
+          <span class="upload-symbol">↑</span>
+          <strong>拖拽图片到这里</strong>
+          <span>或点击下方按钮上传</span>
+        </div>
+        <div class="image-actions">
+          <label class="primary-button" for="image-upload">
+            <span>上传图片</span>
+            <input id="image-upload" type="file" accept="image/*" hidden>
+          </label>
+          <button id="clear-image" class="text-button" type="button">清除选择</button>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <div class="subsection-title">
+          <h3>预设图片</h3>
+          <span>点击即可使用</span>
+        </div>
+        <div id="preset-list" class="preset-grid" aria-label="预设图片列表"></div>
+      </div>
+    </section>
+
+    <section class="response-section glass-card">
+      <div class="section-heading">
+        <div>
+          <span class="section-index">02</span>
+          <h2>写下这一刻</h2>
+          <p>选好选项，或输入只有你们懂的话。</p>
+        </div>
+        <span class="status-chip">可直接提交</span>
+      </div>
+      <div id="fields-container" class="fields-container"></div>
+    </section>
+
+    <section class="background-section glass-card">
+      <div class="section-heading">
+        <div>
+          <span class="section-index">03</span>
+          <h2>挑一种氛围</h2>
+          <p>背景会像流动的玻璃一样持续变化。</p>
+        </div>
+      </div>
+      <div id="background-picker" class="background-picker" aria-label="背景选择"></div>
+    </section>
+
+    <section class="submit-section glass-card">
+      <div>
+        <span class="section-index">04</span>
+        <h2>准备好了吗？</h2>
+        <p>确认内容后提交，操作人员就能看到你的心意。</p>
+      </div>
+      <button id="submit-button" class="submit-button" type="button">
+        <span>提交这一刻</span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/backgrounds.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

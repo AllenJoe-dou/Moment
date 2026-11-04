@@ -1,0 +1,47 @@
+{
+  "title": "一闪 Moment",
+  "description": "把这一瞬间，留给值得的人。",
+  "background": "pink-plum",
+  "imageRequired": true,
+  "images": [
+    { "id": "plum-window", "label": "梅花窗景", "url": "/presets/plum-window.svg" },
+    { "id": "city-light", "label": "城市流光", "url": "/presets/city-light.svg" },
+    { "id": "ocean-breeze", "label": "海风蓝调", "url": "/presets/ocean-breeze.svg" }
+  ],
+  "fields": [
+    {
+      "id": "message",
+      "type": "text",
+      "label": "想说的话",
+      "placeholder": "写下此刻最想说的……",
+      "required": true,
+      "maxLength": 500
+    },
+    {
+      "id": "mood",
+      "type": "choice",
+      "label": "此刻的心情",
+      "required": true,
+      "selection": "single",
+      "options": [
+        { "id": "warm", "label": "温柔" },
+        { "id": "joyful", "label": "雀跃" },
+        { "id": "calm", "label": "平静" },
+        { "id": "miss", "label": "想念" }
+      ]
+    },
+    {
+      "id": "tags",
+      "type": "choice",
+      "label": "给这一刻打上标签",
+      "required": false,
+      "selection": "multiple",
+      "options": [
+        { "id": "spring", "label": "春日" },
+        { "id": "together", "label": "陪伴" },
+        { "id": "gift", "label": "礼物" },
+        { "id": "memory", "label": "纪念" }
+      ]
+    }
+  ]
+}
