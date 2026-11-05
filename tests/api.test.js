@@ -112,6 +112,18 @@ test('API submissions use configured display image and ignore participant image 
 });
 
 
+test('API generates local PNG QR codes and rejects invalid URLs', async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(baseUrl + '/api/qr.png?text=' + encodeURIComponent('https://moment.example.com/'));
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('content-type'), 'image/png');
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    assert.deepEqual([...bytes.slice(0, 4)], [137, 80, 78, 71]);
+
+    const invalid = await fetch(baseUrl + '/api/qr.png?text=' + encodeURIComponent('ftp://example.com'));
+    assert.equal(invalid.status, 400);
+  });
+});
 test('API exports submissions as CSV', async () => {
   await withServer(async (baseUrl) => {
     await fetch(`${baseUrl}/api/submissions`, {
@@ -132,5 +144,6 @@ test('API exports submissions as CSV', async () => {
     assert.match(csv, /"一行,带逗号"/);
   });
 });
+
 
 

@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const crypto = require('node:crypto');
 const express = require('express');
 const multer = require('multer');
+const QRCode = require('qrcode');
 
 const { loadConfig, saveConfig, addSubmission, listSubmissions } = require('./lib/store');
 const { validateSubmission } = require('./lib/validate');
@@ -79,6 +80,24 @@ function createApp(options = {}) {
     res.json(saveConfig(config, dataDir));
   });
 
+  app.get('/api/qr.png', async (req, res) => {
+    const text = String(req.query.text || '');
+    try {
+      const url = new URL(text);
+      if (!['http:', 'https:'].includes(url.protocol)) throw new Error('invalid protocol');
+      const qr = await QRCode.toBuffer(url.toString(), {
+        type: 'png',
+        width: 1024,
+        margin: 2,
+        errorCorrectionLevel: 'H'
+      });
+      res.setHeader('content-type', 'image/png');
+      res.setHeader('cache-control', 'no-store');
+      res.send(qr);
+    } catch {
+      res.status(400).json({ error: '二维码地址必须是有效的 http 或 https URL' });
+    }
+  });
   app.post('/api/upload', upload.single('image'), (req, res) => {
     if (!req.file) {
       res.status(400).json({ error: '请选择图片' });
@@ -165,5 +184,6 @@ if (require.main === module) {
 }
 
 module.exports = { createApp };
+
 
 
