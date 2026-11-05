@@ -33,34 +33,22 @@
       <div class="section-heading">
         <div>
           <span class="section-index">01</span>
-          <h2>选择一张照片</h2>
-          <p>上传自己的照片，或从预设中选一张。</p>
+          <h2>这一刻，被认真呈现</h2>
+          <p>图片由操作人员设置，并在桌面和手机上完整展示。</p>
         </div>
-        <span id="image-status" class="status-chip">尚未选择</span>
+        <span class="status-chip">展示图片</span>
       </div>
 
-      <div class="image-stage">
-        <img id="image-preview" alt="当前选择的图片预览">
-        <div id="image-empty" class="image-empty">
-          <span class="upload-symbol">↑</span>
-          <strong>拖拽图片到这里</strong>
-          <span>或点击下方按钮上传</span>
+      <div id="display-image-frame" class="display-image-frame">
+        <img id="display-image" alt="操作人员设置的展示图片">
+        <div id="display-image-empty" class="display-image-empty" hidden>
+          <strong>暂未设置展示图片</strong>
+          <span>请操作人员在配置页面上传图片。</span>
         </div>
-        <div class="image-actions">
-          <label class="primary-button" for="image-upload">
-            <span>上传图片</span>
-            <input id="image-upload" type="file" accept="image/*" hidden>
-          </label>
-          <button id="clear-image" class="text-button" type="button">清除选择</button>
+        <div class="image-caption">
+          <span id="display-image-label"></span>
+          <span>完整图页 · 不裁剪</span>
         </div>
-      </div>
-
-      <div class="subsection">
-        <div class="subsection-title">
-          <h3>预设图片</h3>
-          <span>点击即可使用</span>
-        </div>
-        <div id="preset-list" class="preset-grid" aria-label="预设图片列表"></div>
       </div>
     </section>
 
@@ -106,4 +94,5 @@
   <script src="/app.js"></script>
 </body>
 </html>
+
 

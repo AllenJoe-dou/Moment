@@ -2,22 +2,18 @@
 
 const state = {
   config: null,
-  selectedImage: null,
-  uploadedImage: null,
   answers: {},
   background: localStorage.getItem('yishan-background') || 'pink-plum'
 };
 
 const elements = {
-  preview: document.querySelector('#image-preview'),
-  empty: document.querySelector('#image-empty'),
-  upload: document.querySelector('#image-upload'),
-  clearImage: document.querySelector('#clear-image'),
-  presetList: document.querySelector('#preset-list'),
+  displayImage: document.querySelector('#display-image'),
+  displayImageFrame: document.querySelector('#display-image-frame'),
+  displayImageEmpty: document.querySelector('#display-image-empty'),
+  displayImageLabel: document.querySelector('#display-image-label'),
   fields: document.querySelector('#fields-container'),
   picker: document.querySelector('#background-picker'),
   submit: document.querySelector('#submit-button'),
-  status: document.querySelector('#image-status'),
   toast: document.querySelector('#toast'),
   title: document.querySelector('h1'),
   description: document.querySelector('#page-description')
@@ -36,63 +32,23 @@ function safeText(value) {
   return span.innerHTML;
 }
 
-function renderPresets() {
-  elements.presetList.innerHTML = state.config.images.map((image) => `
-    <button class="preset-button ${state.selectedImage?.id === image.id ? 'selected' : ''}" type="button" data-image-id="${safeText(image.id)}" aria-label="选择预设图片 ${safeText(image.label)}">
-      <img src="${safeText(image.url)}" alt="${safeText(image.label)}">
-      <span>${safeText(image.label)}</span>
-    </button>
-  `).join('');
-}
-
-function selectPreset(image) {
-  state.selectedImage = { ...image, kind: 'preset' };
-  state.uploadedImage = null;
-  elements.preview.src = image.url;
-  elements.preview.classList.add('visible');
-  elements.empty.classList.add('hidden');
-  elements.status.textContent = image.label;
-  renderPresets();
-}
-
-function clearImage() {
-  state.selectedImage = null;
-  state.uploadedImage = null;
-  elements.preview.removeAttribute('src');
-  elements.preview.classList.remove('visible');
-  elements.empty.classList.remove('hidden');
-  elements.status.textContent = '尚未选择';
-  renderPresets();
-}
-
-async function uploadFile(file) {
-  if (!file || !file.type.startsWith('image/')) {
-    showToast('请选择图片文件');
+function renderDisplayImage() {
+  const image = state.config.images.find((item) => item.id === state.config.displayImageId) || state.config.images[0];
+  if (!image) {
+    elements.displayImage.removeAttribute('src');
+    elements.displayImage.hidden = true;
+    elements.displayImageEmpty.hidden = false;
+    elements.displayImageLabel.textContent = '';
+    elements.displayImageFrame.classList.add('empty');
     return;
   }
 
-  elements.status.textContent = '正在上传…';
-  const previewUrl = URL.createObjectURL(file);
-  elements.preview.src = previewUrl;
-  elements.preview.classList.add('visible');
-  elements.empty.classList.add('hidden');
-
-  const formData = new FormData();
-  formData.append('image', file);
-  const response = await fetch('/api/upload', { method: 'POST', body: formData });
-  if (!response.ok) {
-    elements.status.textContent = '上传失败';
-    showToast('图片上传失败，请重试');
-    return;
-  }
-
-  const uploaded = await response.json();
-  state.uploadedImage = { ...uploaded, label: file.name, kind: 'upload' };
-  state.selectedImage = state.uploadedImage;
-  elements.preview.src = uploaded.url;
-  elements.status.textContent = file.name;
-  renderPresets();
-  showToast('图片上传成功');
+  elements.displayImage.src = image.url;
+  elements.displayImage.alt = image.label || '展示图片';
+  elements.displayImage.hidden = false;
+  elements.displayImageEmpty.hidden = true;
+  elements.displayImageLabel.textContent = image.label || '展示图片';
+  elements.displayImageFrame.classList.remove('empty');
 }
 
 function renderText(field) {
@@ -177,13 +133,9 @@ function collectAnswers() {
 function renderParticipant() {
   elements.title.textContent = state.config.title;
   elements.description.textContent = state.config.description;
-  renderPresets();
+  renderDisplayImage();
   renderFields();
   renderBackgroundPicker();
-
-  if (state.config.images[0]) {
-    selectPreset(state.config.images[0]);
-  }
 }
 
 async function loadConfig() {
@@ -194,32 +146,6 @@ async function loadConfig() {
 }
 
 function bindEvents() {
-  elements.upload.addEventListener('change', (event) => {
-    uploadFile(event.target.files[0]);
-    event.target.value = '';
-  });
-
-  elements.clearImage.addEventListener('click', clearImage);
-
-  const imageStage = document.querySelector('.image-stage');
-  imageStage.addEventListener('dragover', (event) => {
-    event.preventDefault();
-    imageStage.classList.add('dragging');
-  });
-  imageStage.addEventListener('dragleave', () => imageStage.classList.remove('dragging'));
-  imageStage.addEventListener('drop', (event) => {
-    event.preventDefault();
-    imageStage.classList.remove('dragging');
-    uploadFile(event.dataTransfer.files[0]);
-  });
-
-  elements.presetList.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-image-id]');
-    if (!button) return;
-    const image = state.config.images.find((item) => item.id === button.dataset.imageId);
-    if (image) selectPreset(image);
-  });
-
   elements.fields.addEventListener('click', (event) => {
     const button = event.target.closest('.choice-option');
     if (!button) return;
@@ -250,17 +176,9 @@ function bindEvents() {
   });
 
   elements.submit.addEventListener('click', async () => {
-    const answers = collectAnswers();
-    const selectedImage = state.selectedImage;
     const payload = {
-      imageId: selectedImage?.kind === 'preset' ? selectedImage.id : undefined,
-      imageUrl: selectedImage?.kind === 'preset' ? selectedImage.url : undefined,
-      imageLabel: selectedImage?.label,
-      uploadId: selectedImage?.kind === 'upload' ? selectedImage.id : undefined,
-      uploadUrl: selectedImage?.kind === 'upload' ? selectedImage.url : undefined,
-      uploadName: selectedImage?.kind === 'upload' ? selectedImage.label : undefined,
       background: state.background,
-      answers
+      answers: collectAnswers()
     };
 
     elements.submit.disabled = true;

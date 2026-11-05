@@ -625,3 +625,90 @@ a:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+.display-image-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  width: 100%;
+  height: clamp(360px, 52vw, 720px);
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.14)),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0 1px, transparent 1px 18px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84);
+}
+
+#display-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 18px 32px rgba(58, 38, 72, 0.18));
+}
+
+.display-image-frame.empty #display-image {
+  display: none;
+}
+
+.display-image-empty {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.display-image-empty strong {
+  color: var(--ink);
+}
+
+.image-caption {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 6px;
+  color: white;
+  background: rgba(25, 22, 38, 0.52);
+  backdrop-filter: blur(14px);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.image-caption span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .display-image-frame {
+    height: min(62vh, 620px);
+    min-height: 320px;
+    padding: 10px;
+  }
+
+  .image-caption {
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #display-image {
+    filter: none;
+  }
+}

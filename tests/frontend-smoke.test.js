@@ -9,10 +9,13 @@ function read(file) {
   return fs.readFileSync(path.join(root, file), 'utf8');
 }
 
-test('participant page includes upload, presets, fields, background picker, and submit flow', () => {
+test('participant page includes display image, fields, background picker, and submit flow', () => {
   const html = read('public/index.html');
-  assert.match(html, /id="image-upload"/);
-  assert.match(html, /id="preset-list"/);
+  assert.doesNotMatch(html, /id="image-upload"/);
+  assert.doesNotMatch(html, /id="preset-list"/);
+  assert.doesNotMatch(html, /id="clear-image"/);
+  assert.match(html, /id="display-image"/);
+  assert.match(html, /id="display-image-frame"/);
   assert.match(html, /id="fields-container"/);
   assert.match(html, /id="submit-button"/);
   assert.match(html, /id="background-picker"/);
@@ -24,6 +27,8 @@ test('participant page includes upload, presets, fields, background picker, and 
 test('participant styles include liquid glass presentation and responsive rules', () => {
   const css = read('public/styles.css');
   assert.match(css, /backdrop-filter/);
+  assert.match(css, /object-fit:\s*contain/);
+  assert.match(css, /\.display-image-frame/);
   assert.match(css, /@media/);
   assert.match(css, /prefers-reduced-motion/);
   assert.match(css, /\.glass-card/);
@@ -41,9 +46,13 @@ test('background system supports four themes including pink plum particles', () 
 test('participant app wires API calls and accessible form labels', () => {
   const js = read('public/app.js');
   assert.match(js, /\/api\/config/);
-  assert.match(js, /\/api\/upload/);
+  assert.doesNotMatch(js, /\/api\/upload/);
   assert.match(js, /\/api\/submissions/);
+  assert.match(js, /displayImageId/);
   assert.match(js, /aria-label/);
-  assert.match(js, /FormData/);
+  assert.doesNotMatch(js, /FormData/);
 });
+
+
+
 
