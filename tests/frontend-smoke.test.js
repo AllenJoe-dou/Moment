@@ -18,7 +18,8 @@ test('participant page includes display image, fields, background picker, and su
   assert.match(html, /id="display-image-frame"/);
   assert.match(html, /id="fields-container"/);
   assert.match(html, /id="submit-button"/);
-  assert.match(html, /id="background-picker"/);
+  assert.doesNotMatch(html, /id="background-picker"/);
+  assert.doesNotMatch(html, /class="image-caption"/);
   assert.match(html, /一闪 Moment/);
   assert.match(html, /favicon/);
   assert.ok(fs.existsSync(path.join(root, 'public', 'favicon.svg')));
@@ -50,8 +51,11 @@ test('participant app wires API calls and accessible form labels', () => {
   assert.match(js, /\/api\/submissions/);
   assert.match(js, /displayImageId/);
   assert.match(js, /aria-label/);
+  assert.doesNotMatch(js, /renderBackgroundPicker/);
+  assert.doesNotMatch(js, /data-theme/);
   assert.doesNotMatch(js, /FormData/);
 });
+
 
 
 

@@ -3,16 +3,14 @@
 const state = {
   config: null,
   answers: {},
-  background: localStorage.getItem('yishan-background') || 'pink-plum'
+  background: 'pink-plum'
 };
 
 const elements = {
   displayImage: document.querySelector('#display-image'),
   displayImageFrame: document.querySelector('#display-image-frame'),
   displayImageEmpty: document.querySelector('#display-image-empty'),
-  displayImageLabel: document.querySelector('#display-image-label'),
   fields: document.querySelector('#fields-container'),
-  picker: document.querySelector('#background-picker'),
   submit: document.querySelector('#submit-button'),
   toast: document.querySelector('#toast'),
   title: document.querySelector('h1'),
@@ -38,7 +36,6 @@ function renderDisplayImage() {
     elements.displayImage.removeAttribute('src');
     elements.displayImage.hidden = true;
     elements.displayImageEmpty.hidden = false;
-    elements.displayImageLabel.textContent = '';
     elements.displayImageFrame.classList.add('empty');
     return;
   }
@@ -47,7 +44,6 @@ function renderDisplayImage() {
   elements.displayImage.alt = image.label || '展示图片';
   elements.displayImage.hidden = false;
   elements.displayImageEmpty.hidden = true;
-  elements.displayImageLabel.textContent = image.label || '展示图片';
   elements.displayImageFrame.classList.remove('empty');
 }
 
@@ -104,17 +100,6 @@ function renderFields() {
   }).join('');
 }
 
-function renderBackgroundPicker() {
-  const themes = window.YishanBackgrounds.THEMES;
-  elements.picker.innerHTML = Object.entries(themes).map(([key, theme]) => `
-    <button class="background-option ${state.background === key ? 'selected' : ''}" type="button" data-theme="${key}" aria-pressed="${state.background === key}">
-      <span class="background-swatch" style="background: linear-gradient(120deg, ${theme.colors[0]}, ${theme.colors[1]}, ${theme.colors[2]})"></span>
-      <strong>${safeText(theme.label)}</strong>
-      <small>${key === 'pink-plum' ? '梅花缓缓飘落' : '液态玻璃流动'}</small>
-    </button>
-  `).join('');
-}
-
 function collectAnswers() {
   const answers = {};
   state.config.fields.forEach((field) => {
@@ -133,9 +118,9 @@ function collectAnswers() {
 function renderParticipant() {
   elements.title.textContent = state.config.title;
   elements.description.textContent = state.config.description;
+  state.background = state.config.background || 'pink-plum';
   renderDisplayImage();
   renderFields();
-  renderBackgroundPicker();
 }
 
 async function loadConfig() {
@@ -164,15 +149,6 @@ function bindEvents() {
     });
     button.classList.add('selected');
     button.setAttribute('aria-checked', 'true');
-  });
-
-  elements.picker.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-theme]');
-    if (!button) return;
-    state.background = button.dataset.theme;
-    localStorage.setItem('yishan-background', state.background);
-    window.yishanBackground.setTheme(state.background);
-    renderBackgroundPicker();
   });
 
   elements.submit.addEventListener('click', async () => {
@@ -206,11 +182,12 @@ function bindEvents() {
 }
 
 async function init() {
-  window.yishanBackground = window.YishanBackgrounds.initBackground(document.querySelector('#liquid-background'), state.background);
   bindEvents();
   try {
     await loadConfig();
+    window.yishanBackground = window.YishanBackgrounds.initBackground(document.querySelector('#liquid-background'), state.background);
   } catch (error) {
+    window.yishanBackground = window.YishanBackgrounds.initBackground(document.querySelector('#liquid-background'), state.background);
     showToast(error.message, 5000);
   }
 }
