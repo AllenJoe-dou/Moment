@@ -35,6 +35,23 @@ test('admin editor includes controls for copy, images, background, text, and cho
   assert.match(html, /id="add-choice-field"/);
 });
 
+test('admin editor includes display-image selection and QR controls', () => {
+  const html = read('public/admin-edit.html');
+  assert.match(html, /id="generate-qr"/);
+  assert.match(html, /id="save-qr"/);
+  assert.match(html, /id="qr-preview"/);
+  assert.match(html, /id="qr-url"/);
+  assert.match(html, /id="images-editor"/);
+});
+
+test('admin editor generates and downloads operator QR codes', () => {
+  const js = read('public/admin-edit.js');
+  assert.match(js, /\/api\/qr\.png/);
+  assert.match(js, /displayImageId/);
+  assert.match(js, /yishan-moment-qr\.png/);
+  assert.match(js, /data-image-action="setDisplay"/);
+  assert.match(js, /URL\.createObjectURL/);
+});
 test('admin editor script saves config through the API', () => {
   const js = read('public/admin-edit.js');
   assert.match(js, /\/api\/config/);
@@ -43,3 +60,4 @@ test('admin editor script saves config through the API', () => {
   assert.match(js, /add-text-field/);
   assert.match(js, /add-choice-field/);
 });
+

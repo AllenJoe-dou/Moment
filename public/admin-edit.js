@@ -1,6 +1,7 @@
 'use strict';
 
 let config = null;
+let qrBlobUrl = '';
 
 const elements = {
   form: document.querySelector('#config-form'),
@@ -15,6 +16,13 @@ const elements = {
   addTextField: document.querySelector('#add-text-field'),
   addChoiceField: document.querySelector('#add-choice-field'),
   save: document.querySelector('#save-config'),
+  generateQr: document.querySelector('#generate-qr'),
+  saveQr: document.querySelector('#save-qr'),
+  generateQrSecondary: document.querySelector('#generate-qr-secondary'),
+  saveQrSecondary: document.querySelector('#save-qr-secondary'),
+  qrPreview: document.querySelector('#qr-preview'),
+  qrPlaceholder: document.querySelector('#qr-placeholder'),
+  qrUrl: document.querySelector('#qr-url'),
   toast: document.querySelector('#toast')
 };
 
@@ -39,23 +47,30 @@ function uniqueId(prefix) {
 }
 
 function renderImages() {
-  elements.images.innerHTML = config.images.map((image, index) => `
-    <div class="editor-card" data-image-index="${index}">
-      <div class="editor-card-header">
-        <strong>预设图片 ${index + 1}</strong>
-        <div class="card-actions">
-          <button class="icon-button" type="button" data-image-action="up" data-index="${index}" aria-label="上移图片">↑</button>
-          <button class="icon-button" type="button" data-image-action="down" data-index="${index}" aria-label="下移图片">↓</button>
-          <button class="icon-button danger" type="button" data-image-action="delete" data-index="${index}" aria-label="删除图片">×</button>
+  elements.images.innerHTML = config.images.map((image, index) => {
+    const isDisplay = image.id === config.displayImageId;
+    return `
+      <div class="editor-card ${isDisplay ? 'display-card' : ''}" data-image-index="${index}">
+        <div class="editor-card-header">
+          <div>
+            <strong>图片 ${index + 1}</strong>
+            ${isDisplay ? '<span class="display-badge">当前展示图</span>' : ''}
+          </div>
+          <div class="card-actions">
+            <button class="icon-button" type="button" data-image-action="up" data-index="${index}" aria-label="上移图片">↑</button>
+            <button class="icon-button" type="button" data-image-action="down" data-index="${index}" aria-label="下移图片">↓</button>
+            <button class="icon-button danger" type="button" data-image-action="delete" data-index="${index}" aria-label="删除图片">×</button>
+            <button class="display-button" type="button" data-image-action="setDisplay" data-index="${index}">${isDisplay ? '正在展示' : '设为展示图'}</button>
+          </div>
+        </div>
+        <div class="editor-card-grid">
+          <label>图片名称<input type="text" data-image-field="label" data-index="${index}" value="${escapeHtml(image.label)}"></label>
+          <label>图片地址<input type="text" data-image-field="url" data-index="${index}" value="${escapeHtml(image.url)}"></label>
+          <img class="image-preview wide" src="${escapeHtml(image.url)}" alt="${escapeHtml(image.label)}">
         </div>
       </div>
-      <div class="editor-card-grid">
-        <label>图片名称<input type="text" data-image-field="label" data-index="${index}" value="${escapeHtml(image.label)}"></label>
-        <label>图片地址<input type="text" data-image-field="url" data-index="${index}" value="${escapeHtml(image.url)}"></label>
-        <img class="image-preview wide" src="${escapeHtml(image.url)}" alt="${escapeHtml(image.label)}">
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function renderFields() {
@@ -163,14 +178,53 @@ async function uploadAdminImage(file) {
     label: file.name.replace(/\.[^.]+$/, ''),
     url: uploaded.url
   });
+  if (!config.displayImageId) config.displayImageId = uploaded.id;
   renderImages();
-  showToast('图片已添加到预设列表');
+  showToast('图片已添加，可设为展示图');
+}
+
+function participantUrl() {
+  return new URL('/', window.location.origin).toString();
+}
+
+async function makeQrBlob() {
+  const url = participantUrl();
+  elements.qrUrl.textContent = url;
+  const response = await fetch('/api/qr.png?text=' + encodeURIComponent(url));
+  if (!response.ok) throw new Error('二维码生成失败');
+  return response.blob();
+}
+
+async function generateQr() {
+  const blob = await makeQrBlob();
+  if (qrBlobUrl) URL.revokeObjectURL(qrBlobUrl);
+  qrBlobUrl = URL.createObjectURL(blob);
+  elements.qrPreview.src = qrBlobUrl;
+  elements.qrPreview.hidden = false;
+  elements.qrPlaceholder.hidden = true;
+  showToast('二维码已生成');
+}
+
+async function saveQr() {
+  try {
+    if (!qrBlobUrl) await generateQr();
+    const anchor = document.createElement('a');
+    anchor.href = qrBlobUrl;
+    anchor.download = 'yishan-moment-qr.png';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    showToast('二维码已保存');
+  } catch (error) {
+    showToast(error.message);
+  }
 }
 
 function bindEvents() {
   elements.addImage.addEventListener('click', () => {
     collectConfig();
     config.images.push({ id: uniqueId('image'), label: '新图片', url: '/presets/plum-window.svg' });
+    if (!config.displayImageId) config.displayImageId = config.images.at(-1).id;
     renderImages();
   });
 
@@ -184,9 +238,17 @@ function bindEvents() {
     if (!button) return;
     collectConfig();
     const index = Number(button.dataset.index);
-    if (button.dataset.imageAction === 'delete') config.images.splice(index, 1);
-    if (button.dataset.imageAction === 'up') moveItem(config.images, index, -1);
-    if (button.dataset.imageAction === 'down') moveItem(config.images, index, 1);
+    const action = button.dataset.imageAction;
+    if (action === 'delete') {
+      const removed = config.images.splice(index, 1)[0];
+      if (removed?.id === config.displayImageId) config.displayImageId = config.images[0]?.id || '';
+    }
+    if (action === 'up') moveItem(config.images, index, -1);
+    if (action === 'down') moveItem(config.images, index, 1);
+    if (action === 'setDisplay') {
+      config.displayImageId = config.images[index]?.id || config.displayImageId;
+      showToast('展示图片已更新');
+    }
     renderImages();
   });
 
@@ -230,6 +292,14 @@ function bindEvents() {
     renderFields();
   });
 
+  [elements.generateQr, elements.generateQrSecondary].forEach((button) => {
+    button.addEventListener('click', () => generateQr().catch((error) => showToast(error.message)));
+  });
+
+  [elements.saveQr, elements.saveQrSecondary].forEach((button) => {
+    button.addEventListener('click', saveQr);
+  });
+
   elements.save.addEventListener('click', async () => {
     const payload = collectConfig();
     elements.save.disabled = true;
@@ -266,6 +336,7 @@ async function init() {
   renderImages();
   renderFields();
   bindEvents();
+  elements.qrUrl.textContent = participantUrl();
 }
 
 init();

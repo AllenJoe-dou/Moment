@@ -30,6 +30,8 @@
       </div>
       <div class="heading-actions">
         <a class="text-button" href="/">预览页面</a>
+        <button id="generate-qr" class="text-button" type="button">生成二维码</button>
+        <button id="save-qr" class="text-button" type="button">保存二维码</button>
         <button id="save-config" class="primary-button" type="button">保存配置</button>
       </div>
     </section>
@@ -56,7 +58,7 @@
 
       <section class="editor-section">
         <div class="editor-heading">
-          <div><span class="section-index">02</span><h2>预设图片</h2></div>
+          <div><span class="section-index">02</span><h2>展示图片与预设</h2></div>
           <div class="editor-actions">
             <label class="text-button" for="image-upload-admin">上传图片<input id="image-upload-admin" type="file" accept="image/*" hidden></label>
             <button id="add-image" class="text-button" type="button">添加图片链接</button>
@@ -75,11 +77,31 @@
         </div>
         <div id="fields-editor" class="stack-editor"></div>
       </section>
-    </form>
+      <section class="editor-section qr-section">
+        <div class="editor-heading">
+          <div><span class="section-index">04</span><h2>参与者二维码</h2></div>
+          <div class="editor-actions">
+            <button id="generate-qr-secondary" class="text-button" type="button">刷新二维码</button>
+            <button id="save-qr-secondary" class="primary-button" type="button">保存二维码</button>
+          </div>
+        </div>
+        <div class="qr-layout">
+          <div class="qr-preview-wrap">
+            <img id="qr-preview" alt="参与者页面二维码" hidden>
+            <div id="qr-placeholder" class="qr-placeholder">生成后显示二维码</div>
+          </div>
+          <div class="qr-copy">
+            <strong>二维码地址</strong>
+            <code id="qr-url">http://localhost:3000/</code>
+            <p>二维码自动使用当前访问地址，指向参与者首页。</p>
+          </div>
+        </div>
+      </section>    </form>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="/admin-edit.js"></script>
 </body>
 </html>
+
 
