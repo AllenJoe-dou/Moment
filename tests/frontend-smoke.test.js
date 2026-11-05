@@ -20,6 +20,8 @@ test('participant page includes display image, fields, background picker, and su
   assert.match(html, /id="submit-button"/);
   assert.doesNotMatch(html, /id="background-picker"/);
   assert.doesNotMatch(html, /class="image-caption"/);
+  assert.doesNotMatch(html, /class="status-chip">展示图片</);
+  assert.doesNotMatch(html, /class="status-chip">可直接提交</);
   assert.match(html, /一闪 Moment/);
   assert.match(html, /favicon/);
   assert.ok(fs.existsSync(path.join(root, 'public', 'favicon.svg')));
@@ -29,6 +31,8 @@ test('participant styles include liquid glass presentation and responsive rules'
   const css = read('public/styles.css');
   assert.match(css, /backdrop-filter/);
   assert.match(css, /object-fit:\s*contain/);
+  assert.match(css, /#display-image[^}]*height:\s*auto/s);
+  assert.doesNotMatch(css, /\.display-image-frame[^}]*height:\s*clamp/s);
   assert.match(css, /\.display-image-frame/);
   assert.match(css, /@media/);
   assert.match(css, /prefers-reduced-motion/);
@@ -55,6 +59,8 @@ test('participant app wires API calls and accessible form labels', () => {
   assert.doesNotMatch(js, /data-theme/);
   assert.doesNotMatch(js, /FormData/);
 });
+
+
 
 
 
