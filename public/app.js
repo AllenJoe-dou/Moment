@@ -9,7 +9,6 @@ const state = {
 const elements = {
   displayImage: document.querySelector('#display-image'),
   displayImageFrame: document.querySelector('#display-image-frame'),
-  displayImageEmpty: document.querySelector('#display-image-empty'),
   fields: document.querySelector('#fields-container'),
   submit: document.querySelector('#submit-button'),
   toast: document.querySelector('#toast'),
@@ -35,7 +34,6 @@ function renderDisplayImage() {
   if (!image) {
     elements.displayImage.removeAttribute('src');
     elements.displayImage.hidden = true;
-    elements.displayImageEmpty.hidden = false;
     elements.displayImageFrame.classList.add('empty');
     return;
   }
@@ -43,7 +41,6 @@ function renderDisplayImage() {
   elements.displayImage.src = image.url;
   elements.displayImage.alt = image.label || '展示图片';
   elements.displayImage.hidden = false;
-  elements.displayImageEmpty.hidden = true;
   elements.displayImageFrame.classList.remove('empty');
 }
 
@@ -193,3 +190,5 @@ async function init() {
 }
 
 init();
+
+

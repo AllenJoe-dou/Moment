@@ -22,6 +22,9 @@ test('participant page includes display image, fields, background picker, and su
   assert.doesNotMatch(html, /class="image-caption"/);
   assert.doesNotMatch(html, /class="status-chip">展示图片</);
   assert.doesNotMatch(html, /class="status-chip">可直接提交</);
+  assert.doesNotMatch(html, /暂未设置展示图片/);
+  assert.doesNotMatch(html, /请操作人员在配置页面上传图片/);
+  assert.doesNotMatch(html, /display-image-empty/);
   assert.match(html, /一闪 Moment/);
   assert.match(html, /favicon/);
   assert.ok(fs.existsSync(path.join(root, 'public', 'favicon.svg')));
@@ -59,6 +62,7 @@ test('participant app wires API calls and accessible form labels', () => {
   assert.doesNotMatch(js, /data-theme/);
   assert.doesNotMatch(js, /FormData/);
 });
+
 
 
 

@@ -656,17 +656,6 @@ a:focus-visible {
   display: none;
 }
 
-.display-image-empty {
-  display: grid;
-  place-items: center;
-  gap: 8px;
-  color: var(--muted);
-  text-align: center;
-}
-
-.display-image-empty strong {
-  color: var(--ink);
-}
 
 .image-caption {
   position: absolute;
@@ -712,6 +701,7 @@ a:focus-visible {
     filter: none;
   }
 }
+
 
 
 
