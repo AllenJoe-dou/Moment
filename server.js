@@ -100,15 +100,15 @@ function createApp(options = {}) {
     }
 
     const body = req.body || {};
-    const preset = (config.images || []).find((image) => image.id === body.imageId);
+    const displayImage = (config.images || []).find((image) => image.id === config.displayImageId) || (config.images || [])[0];
     const submission = addSubmission({
       background: body.background || config.background,
-      image: {
-        id: body.uploadId || body.imageId || '',
-        url: body.uploadUrl || body.imageUrl || preset?.url || '',
-        label: body.imageLabel || body.uploadName || preset?.label || '自定义图片',
-        kind: body.uploadId ? 'upload' : 'preset'
-      },
+      image: displayImage ? {
+        id: displayImage.id,
+        url: displayImage.url,
+        label: displayImage.label,
+        kind: displayImage.url.startsWith('/uploads/') ? 'upload' : 'preset'
+      } : null,
       answers: body.answers || {},
       userAgent: req.get('user-agent') || ''
     }, dataDir);
@@ -165,3 +165,5 @@ if (require.main === module) {
 }
 
 module.exports = { createApp };
+
+

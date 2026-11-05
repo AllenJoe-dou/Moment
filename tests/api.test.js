@@ -82,6 +82,36 @@ test('API uploads an image and stores a submission', async () => {
   });
 });
 
+test('API submissions use configured display image and ignore participant image overrides', async () => {
+  await withServer(async (baseUrl) => {
+    const config = await (await fetch(baseUrl + '/api/config')).json();
+    config.displayImageId = 'city-light';
+    await fetch(baseUrl + '/api/config', {
+      method: 'PUT',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+
+    const response = await fetch(baseUrl + '/api/submissions', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        imageId: 'plum-window',
+        imageUrl: '/presets/plum-window.svg',
+        uploadId: 'participant-upload.png',
+        background: 'pink-plum',
+        answers: { message: '展示图测试', mood: 'warm', tags: [] }
+      })
+    });
+    assert.equal(response.status, 201);
+    const submission = await response.json();
+    assert.equal(submission.image.id, 'city-light');
+    assert.equal(submission.image.url, '/presets/city-light.svg');
+    assert.equal(submission.image.kind, 'preset');
+  });
+});
+
+
 test('API exports submissions as CSV', async () => {
   await withServer(async (baseUrl) => {
     await fetch(`${baseUrl}/api/submissions`, {
@@ -102,3 +132,5 @@ test('API exports submissions as CSV', async () => {
     assert.match(csv, /"一行,带逗号"/);
   });
 });
+
+

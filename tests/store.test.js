@@ -20,6 +20,24 @@ test('loads and saves config in a data directory', () => {
   assert.equal(loadConfig(dir).title, '测试时刻');
 });
 
+test('normalizes displayImageId to an existing image', () => {
+  const dir = tempDir();
+  saveConfig({
+    title: 'Test',
+    description: 'Test',
+    background: 'pink-plum',
+    imageRequired: true,
+    displayImageId: 'missing',
+    images: [
+      { id: 'first', label: 'First', url: '/first.png' },
+      { id: 'second', label: 'Second', url: '/second.png' }
+    ],
+    fields: []
+  }, dir);
+  assert.equal(loadConfig(dir).displayImageId, 'first');
+});
+
+
 test('adds submissions and lists newest first', () => {
   const dir = tempDir();
   addSubmission({ id: 'one', createdAt: '2026-11-04T01:00:00.000Z' }, dir);
@@ -54,3 +72,4 @@ test('rejects missing required text and invalid choices', () => {
   }, config);
   assert.equal(valid.ok, true);
 });
+
